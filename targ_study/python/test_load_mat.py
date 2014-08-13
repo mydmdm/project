@@ -296,6 +296,8 @@ def prepare_data_file(offset_idx, tdmr=0, read=[0],
     #
 #    print NRZ.shape
 #    print Zest.shape
+    Zest[0 :pEncStart] = NRZ_BIT[0 :pEncStart]
+    Zest[pEncStart + enclen :-1] = NRZ_BIT[pEncStart + enclen :-1]
     ber, numErr = count_ber(NRZ_BIT, Zest,
                             start=pEncStart, stop=pEncStart+enclen)
     #

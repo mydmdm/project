@@ -5,7 +5,7 @@ Created on Fri Jul 11 14:02:45 2014
 @author: Justin
 """
 
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as pyplot
 import math
 
 import viterbi
@@ -47,22 +47,22 @@ print math.log10(ber2)
 
 #%% 
 figure(1)
-plt.clf()
-plt.hold(True)
+pyplot.clf()
+pyplot.hold(True)
 zid = np.zeros(len(fout))
 for k in range(len(fout)):
     zid[k] = sum([fout[k][x][4] for x in range(len(fout[k]))]) / len(fout[k])
-    _ = plt.hist([fout[k][x][4] for x in range(len(fout[k]))],
+    _ = pyplot.hist([fout[k][x][4] for x in range(len(fout[k]))],
                   bins=32, range=[-32,32], histtype='step')
-plt.hold(False)
-plt.grid(True)
+pyplot.hold(False)
+pyplot.grid(True)
 
 figure(2)
-plt.clf()
-plt.hold(True)
-plt.plot(zid,'-bs')
-plt.hold(False)
-plt.grid(True)
+pyplot.clf()
+pyplot.hold(True)
+pyplot.plot(zid,'-bs')
+pyplot.hold(False)
+pyplot.grid(True)
 
 #%% test for different target
 ber = [
@@ -72,14 +72,14 @@ ber = [
     ]
 
 
-plt.figure(1)
-plt.clf()
-plt.hold(True)
-#plt.plot(Y[range(1000)], '-bs')
-#plt.plot(Yid[range(1000)], '-r.')
-plt.plot(range(6,13),ber)
-plt.hold(False)
-plt.grid(True)
+pyplot.figure(1)
+pyplot.clf()
+pyplot.hold(True)
+#pyplot.plot(Y[range(1000)], '-bs')
+#pyplot.plot(Yid[range(1000)], '-r.')
+pyplot.plot(range(6,13),ber)
+pyplot.hold(False)
+pyplot.grid(True)
 
 #%% test for different track
 reload(viterbi)
@@ -101,13 +101,13 @@ for t in range(len(targ_adpt_arr)):
 
 
 #%%
-plt.figure(1)
-plt.clf()
-plt.hold(True)
-plt.plot(track_idx, np.log10(np.array(ber0[0])), '-bs')
-plt.plot(track_idx, np.log10(np.array(ber0[1])), '-rs')
-plt.hold(False)
-plt.grid(True)
+pyplot.figure(1)
+pyplot.clf()
+pyplot.hold(True)
+pyplot.plot(track_idx, np.log10(np.array(ber0[0])), '-bs')
+pyplot.plot(track_idx, np.log10(np.array(ber0[1])), '-rs')
+pyplot.hold(False)
+pyplot.grid(True)
 
 #%%
 reload(viterbi)
@@ -140,12 +140,12 @@ ber2 = [
         )[0]
     for k in t0_tap
     ]
-plt.figure(1)
-plt.clf()
-plt.hold(True)
-plt.plot(t0_tap, np.log10(np.array(ber2)), '-bs')
-plt.hold(False)
-plt.grid(True)
+pyplot.figure(1)
+pyplot.clf()
+pyplot.hold(True)
+pyplot.plot(t0_tap, np.log10(np.array(ber2)), '-bs')
+pyplot.hold(False)
+pyplot.grid(True)
 
 #%%
 reload(viterbi)
@@ -162,9 +162,9 @@ ber3 = [test_load_mat.prepare_data_file(
     )[0]
     for r in read_arr
     ]
-plt.figure(1)
-plt.clf()
-plt.hold(True)
-plt.plot(read_arr, np.log10(np.array(ber3)), '-bs')
-plt.hold(False)
-plt.grid(True)    
+pyplot.figure(1)
+pyplot.clf()
+pyplot.hold(True)
+pyplot.plot(read_arr, np.log10(np.array(ber3)), '-bs')
+pyplot.hold(False)
+pyplot.grid(True)    

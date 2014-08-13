@@ -6,9 +6,10 @@ Created on Sun Jul 13 22:41:55 2014
 """
 
 import math
-import numpy as np
+import numpy as numpy
 import viterbi
 import matplotlib.pyplot as plt
+import scipy.signal as signal
 
 def map_bitSeq_npIndex(bit, npLen, base=2):
     '''LEFT is latest bit'''
@@ -19,13 +20,33 @@ def map_bitSeq_npIndex(bit, npLen, base=2):
         base=base)
     return idx
 
+def noise_prediction_error_pattern(BIT, EST, Y, Yid, npLen=5, npLA=0):
+    '''npLA: numpy look ahead'''
+    npidx = signal.lfilter(
+        numpy.power(2, numpy.arange(npLen)), [1.0], BIT, 
+        axis=0)
+    Ye = Y - Yid
+    errPat = [[] for k in range(2**npLen)]
+    errSmp = [[] for k in range(2**npLen)]
+    ra = numpy.nonzero(BIT - EST)
+    for k in range(len(ra)):
+        idx = int(npidx[ra[k] + npLA])
+        errPat[idx].append(
+            [BIT[x] for x in range(k + npLA, k + npLA - npLen, -1)]
+        )
+        errsmp[idx].append(
+            [Ye[x] for x in range(k + npLA, k + npLA - npLen, -1)]
+        )
+    
+    plt.figure(1)
+
 def noise_prediction_cal(Y, Yid, BIT, npLen=5):
     E = Y - Yid
     npNum = 2 ** npLen
     fout = [[] for k in range(npNum)]
-    npfir = [np.zeros((npLen - 1, 1)) for k in range(npNum)]
-    npmean = np.zeros(npNum)
-    npidx = np.zeros(len(BIT), dtype='int')
+    npfir = [numpy.zeros((npLen - 1, 1)) for k in range(npNum)]
+    npmean = numpy.zeros(npNum)
+    npidx = numpy.zeros(len(BIT), dtype='int')
     for k in range(npLen, len(BIT)):
 #        idx = int(
 #            ''.join(
@@ -40,20 +61,20 @@ def noise_prediction_cal(Y, Yid, BIT, npLen=5):
             [E[x] for x in range(k, k - npLen, -1)],
             )
     for k in range(npNum):
-        Rxx = np.zeros((npLen - 1, npLen - 1))
-        P = np.zeros((npLen - 1, 1))
+        Rxx = numpy.zeros((npLen - 1, npLen - 1))
+        P = numpy.zeros((npLen - 1, 1))
         S = 0
         for m in range(len(fout[k])):
-#            x = np.array(
+#            x = numpy.array(
 #                [fout[k][m][n] for n in reversed(range(npLen - 1))]
 #                ).reshape(-1, 1)
-            x = np.array(fout[k][m][1:]).reshape(-1, 1)
+            x = numpy.array(fout[k][m][1:]).reshape(-1, 1)
             Rxx += x * x.T
             P += fout[k][m][0] * x
             S += fout[k][m][0]
-        npfir[k] = np.vstack((
+        npfir[k] = numpy.vstack((
             1.0, 
-            -np.dot(np.linalg.pinv(Rxx), P)
+            -numpy.dot(numpy.linalg.pinv(Rxx), P)
             )).reshape(-1, 1)
         npmean[k] = S / len(fout[k])
     return (fout, npfir, npmean, npidx)
@@ -65,10 +86,10 @@ def noise_prediction_verify(fout, npfir, npmean, npLen=5,
     var_err = [0 for k in range(npNum)]
     var_err_np = [0 for k in range(npNum)]
     for k in range(npNum):
-        E = np.array(fout[k])
-        #NP = np.array([npfir[k][x] for x in reversed(range(len(npfir[k])))])
-        var_err[k] = np.var(E[:, 0])
-        var_err_np[k] = np.var(E.dot(npfir[k]) - npmean[k])
+        E = numpy.array(fout[k])
+        #NP = numpy.array([npfir[k][x] for x in reversed(range(len(npfir[k])))])
+        var_err[k] = numpy.var(E[:, 0])
+        var_err_np[k] = numpy.var(E.dot(npfir[k]) - npmean[k])
     ber_per_np = []
     if len(BIT) > 1 and len(BIT) == len(EST) and len(BIT) == len(IDX):
         ber_per_np = [0 for k in range(npNum)]
@@ -79,13 +100,13 @@ def noise_prediction_verify(fout, npfir, npmean, npLen=5,
     plt.clf()
     plt.subplot(2,1,1)
     plt.hold(True)
-    plt.plot(np.arange(npNum), var_err, '-bo')
-    plt.plot(np.arange(npNum), var_err_np, '-ro')
+    plt.plot(numpy.arange(npNum), var_err, '-bo')
+    plt.plot(numpy.arange(npNum), var_err_np, '-ro')
     plt.hold(False)
     plt.grid(True)
     plt.subplot(2,1,2)
     if ber_per_np:
-        plt.plot(np.arange(npNum), ber_per_np, '-ro')
+        plt.plot(numpy.arange(npNum), ber_per_np, '-ro')
         plt.grid(True)
 
 
@@ -127,8 +148,8 @@ class class_npml_det(viterbi.class_viterbi):
         _, idx = self.stateTransition(stCurrent, msg)
         s = viterbi.int2base_list(idx, self.Q, self.depth + 1,
                                   polr=0, lsbFirst=1)
-        sa = np.array(s)
-        E = np.array([
+        sa = numpy.array(s)
+        E = numpy.array([
             Y[k] - (sa[k: k + self.tarLen]*2 - 1).dot(self.target)
             for k in range(0, self.npLen)
             ])
