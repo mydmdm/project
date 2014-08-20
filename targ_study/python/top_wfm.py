@@ -17,6 +17,19 @@ ber, Z, Y, Yid, X, NRZ, W, PR_out = test_load_mat.prepare_data_file(
     PR=[8, 14], targ_adpt=0,
     npLen=0)
 
+#%%
+ek = numpy.nonzero(Z - NRZ)[0]
+nlen = 5
+nla = 2
+A = []
+for k in range(len(ek)):
+    A.append(NRZ[ek[k]-nlen+1: ek[k]+nla])
+A = numpy.array(A)
+pyplot.figure(1)
+pyplot.clf()
+pyplot.plot(numpy.arange(-nlen + 1, nla), A.T)
+pyplot.axis([-nlen, nla, -0.5, 1.5])
+
 #%% basic test
 reload(viterbi)
 reload(noise_predict)
