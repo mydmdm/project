@@ -8,7 +8,7 @@ Created on Sun Jul 13 22:41:55 2014
 import math
 import numpy as numpy
 import viterbi
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as pyplot
 import scipy.signal as signal
 
 def map_bitSeq_npIndex(bit, npLen, base=2):
@@ -22,23 +22,34 @@ def map_bitSeq_npIndex(bit, npLen, base=2):
 
 def noise_prediction_error_pattern(BIT, EST, Y, Yid, npLen=5, npLA=0):
     '''npLA: numpy look ahead'''
+    ek = numpy.nonzero(EST - BIT)
     npidx = signal.lfilter(
         numpy.power(2, numpy.arange(npLen)), [1.0], BIT, 
         axis=0)
     Ye = Y - Yid
-    errPat = [[] for k in range(2**npLen)]
-    errSmp = [[] for k in range(2**npLen)]
-    ra = numpy.nonzero(BIT - EST)
-    for k in range(len(ra)):
-        idx = int(npidx[ra[k] + npLA])
-        errPat[idx].append(
-            [BIT[x] for x in range(k + npLA, k + npLA - npLen, -1)]
-        )
-        errsmp[idx].append(
-            [Ye[x] for x in range(k + npLA, k + npLA - npLen, -1)]
-        )
-    
-    plt.figure(1)
+    A = []
+    E = []
+    for k in range(len(ek)):
+        A.append(npidx[ek[k] + npLA])
+        E.append(Ye[ek[k] + npLA])
+    A = numpy.array(A)
+    E = numpy.array(E)
+    histA = numpy.zeros((2 ** npLen))
+    histE = numpy.zeros((2 ** npLen))
+    for k in range(2 ** npLen):
+        r = numpy.nonzero(A[0,:] == k)[0]
+        print k, len(r), E[0, r]
+        if len(r):
+            histA[k] = len(r)
+            histE[k] = numpy.dot(E[0, r], E[0, r]) / len(r)
+        
+    pyplot.figure(1)
+    pyplot.clf()
+    pyplot.hold(True)
+    pyplot.plot(numpy.arange(2 ** npLen), histA, '-bs')
+    pyplot.plot(numpy.arange(2 ** npLen), histE, '-rs')
+    pyplot.hold(False) 
+    pyplot.grid(True)
 
 def noise_prediction_cal(Y, Yid, BIT, npLen=5):
     E = Y - Yid
@@ -96,18 +107,18 @@ def noise_prediction_verify(fout, npfir, npmean, npLen=5,
         for k in range(1000, len(BIT)-1000):
             if EST[k] != BIT[k]:
                 ber_per_np[IDX[k+2]] += 1
-    plt.figure(1)
-    plt.clf()
-    plt.subplot(2,1,1)
-    plt.hold(True)
-    plt.plot(numpy.arange(npNum), var_err, '-bo')
-    plt.plot(numpy.arange(npNum), var_err_np, '-ro')
-    plt.hold(False)
-    plt.grid(True)
-    plt.subplot(2,1,2)
+    pyplot.figure(1)
+    pyplot.clf()
+    pyplot.subplot(2,1,1)
+    pyplot.hold(True)
+    pyplot.plot(numpy.arange(npNum), var_err, '-bo')
+    pyplot.plot(numpy.arange(npNum), var_err_np, '-ro')
+    pyplot.hold(False)
+    pyplot.grid(True)
+    pyplot.subplot(2,1,2)
     if ber_per_np:
-        plt.plot(numpy.arange(npNum), ber_per_np, '-ro')
-        plt.grid(True)
+        pyplot.plot(numpy.arange(npNum), ber_per_np, '-ro')
+        pyplot.grid(True)
 
 
 class class_noise_predict:

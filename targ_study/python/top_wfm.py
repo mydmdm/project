@@ -18,17 +18,25 @@ ber, Z, Y, Yid, X, NRZ, W, PR_out = test_load_mat.prepare_data_file(
     npLen=0)
 
 #%%
-ek = numpy.nonzero(Z - NRZ)[0]
-nlen = 5
-nla = 2
-A = []
-for k in range(len(ek)):
-    A.append(NRZ[ek[k]-nlen+1: ek[k]+nla])
-A = numpy.array(A)
-pyplot.figure(1)
-pyplot.clf()
-pyplot.plot(numpy.arange(-nlen + 1, nla), A.T)
-pyplot.axis([-nlen, nla, -0.5, 1.5])
+#ek = numpy.nonzero(Z - NRZ)[0]
+#nlen = 5
+#nla = 2
+#A = []
+#for k in range(len(ek)):
+#    A.append(NRZ[ek[k]-nlen+1: ek[k]+nla])
+#A = numpy.array(A)
+#pyplot.figure(1)
+#pyplot.clf()
+#pyplot.plot(numpy.arange(-nlen + 1, nla), A.T)
+#pyplot.axis([-nlen, nla, -0.5, 1.5])
+#
+#pyplot.clf()
+#B = numpy.array([0,16,8,4,2,1])
+#n = numpy.sum(B) + 1
+#pyplot.hist(numpy.dot(A, B), range=(0,n), bins=n)
+#pyplot.show()
+reload(noise_predict)
+noise_predict.noise_prediction_error_pattern(NRZ, Z, Y, Yid, 5, 1)
 
 #%% basic test
 reload(viterbi)
